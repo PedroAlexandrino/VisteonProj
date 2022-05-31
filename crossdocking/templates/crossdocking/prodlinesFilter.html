@@ -1,0 +1,745 @@
+{% extends "vware/baseArmazem.html" %}
+{% load static %}
+
+{% block body_title %}
+    <div class="text-primary">
+        <h6><b><i class="fa fa-home text-secondary"></i><a href={% url 'main:main' %}><span
+                class="text-secondary"> Home | </span></a> Prodlines</b></h6>
+    </div>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>jQuery UI Datepicker - Default functionality</title>
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <link rel="stylesheet" href="/resources/demos/style.css">
+
+    <style>
+        .containerPrincipal {
+            height: 835px;
+            width: 100%;
+            top: 11px;
+            left: 0px;
+            position: relative;
+            border: 3px solid transparent;
+        }
+    </style>
+{% endblock %}
+
+
+{% block body_content %}
+    <div class="containerPrincipal">
+        <div style="right: 130px; position: absolute; top: 800px" id="uploadClass">
+            <form method="POST" enctype="multipart/form-data" action="{% url 'crossdocking:schedulePlanning' %}">
+                {% csrf_token %}
+                <input class="form-control ml-4" style="width:600px" type="hidden" accept="" name="textPath"
+                       id="textPath">
+                <button type="submit" class="btn btn-outline-primary ml-4 mt-3">Search
+                </button>
+                <input type="hidden" accept="" id="textPath"></br>
+                <input type="hidden" id="requestDay" name="requestDay" value="{{ data }}">
+                <input type="hidden" id="data" name="data" value="{{ data }}">
+            </form>
+        </div>
+
+        <!-- tabela que mostra os prodlines do ficheiro que coincidem com os da tabela prodlines -->
+        <div style="top:0%; height: 257px; width: 100%; background-color: #C2C4C5; position: absolute">
+            <p>
+            <h1 style="text-align: center; font-size: 40px; color: #FBA51A; text-shadow: 2px 2px 2px darkslategray; margin-top: -5px; margin-bottom: -15px">
+                Daily Schedule</h1></p>
+            <table id="tabelaFiltrada" class="display" style="width:100%;">
+                <thead>
+                <tr>
+                    <th style="text-shadow: .5px .5px black; text-align: center">Line</th>
+                    <th style="text-shadow: .5px .5px black; text-align: center">Site</th>
+                    <th style="text-shadow: .5px .5px black; text-align: center">Due Date</th>
+                    <th style="text-shadow: .5px .5px black; text-align: center">Item Number</th>
+                    <th style="text-shadow: .5px .5px black; text-align: center">Description</th>
+                    <th style="text-shadow: .5px .5px black; text-align: center">To Complete</th>
+                    <th style="text-shadow: .5px .5px black; text-align: center">Receiving</th>
+                    <th style="text-shadow: .5px .5px black">Comentário Receiving</th>
+                    <th style="text-shadow: .5px .5px black; text-align: center">Shipping</th>
+                    <th style="text-shadow: .5px .5px black">Comentário Shipping</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for element in dadosDia.all %}
+                    <tr>
+                        <td style="text-align: center">{{ element.line }}</td>
+                        <td style="text-align: center">{{ element.site }}</td>
+                        <td style="text-align: center">{{ element.due_date }}</td>
+                        <td style="text-align: center">{{ element.item_number }}</td>
+                        <td style="text-align: center">{{ element.description }}</td>
+                        <td style="text-align: center">{{ element.to_complete }}</td>
+                        {% if element.receiving %}
+                            <td style="text-align: center">
+                                <input type="checkbox" id="{{ element.id }}"
+                                       autocomplete="off" checked>
+                            </td>
+                        {% else %}
+                            <td style="text-align: center">
+                                <input type="checkbox" id="{{ element.id }}"
+                                       autocomplete="off">
+                            </td>
+                        {% endif %}
+                        <td style="text-align: center">
+                            <input type="text" class="form-control w-75"
+                                   id="{{ element.id }}" value="{{ element.comentarioReceiving }}">
+                        </td>
+                        {% if element.shipping %}
+                            <td style="text-align: center">
+                                <input type="checkbox" id="{{ element.id }}"
+                                       autocomplete="off" checked>
+                            </td>
+                        {% else %}
+                            <td style="text-align: center">
+                                <input type="checkbox" id="{{ element.id }}"
+                                       autocomplete="off">
+                            </td>
+                        {% endif %}
+
+                        <td style="text-align: center">
+                            <input class="form-control w-75" type="text" id="{{ element.id }}"
+                                   value="{{ element.comentarioShipping }}">
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+                <tfoot>
+                <tr>
+                    {% if dadosDia and not dadosDia.values.0 == None %}
+                        <th style="text-align: right; text-shadow: .5px .5px black" colspan="6">SUBMIT</th>
+                        {% if dadosDia.values.0.allOkReceiving == True %}
+                            <td style="text-align: center"><input type="checkbox" autocomplete="off" id="allOkReceiving"
+                                                                  checked></td>
+                        {% else %}
+                            <td style="text-align: center"><input type="checkbox" autocomplete="off"
+                                                                  id="allOkReceiving">
+                            </td>
+                        {% endif %}
+                        <th style="text-align: right; text-shadow: .5px .5px black">SUBMIT</th>
+                        {% if dadosDia.values.0.allOkShipping == True %}
+                            <td style="text-align: center"><input type="checkbox" autocomplete="off" id="allOkShipping"
+                                                                  checked></td>
+                        {% else %}
+                            <td style="text-align: center"><input type="checkbox" autocomplete="off" id="allOkShipping">
+                            </td>
+                        {% endif %}
+                        <td></td>
+                    {% endif %}
+                </tr>
+                {% if erro3 %}
+                    <tr>
+                        <th colspan="10" style="text-align: center; color: red"><h1>{{ erro3 }}</h1></th>
+                    </tr>
+                {% endif %}
+                </tfoot>
+            </table>
+            {% if erro1 %}
+                <h3><b style="margin-left: 200px">{{ erro1 }}</b></h3></br>
+            {% endif %}
+            {% if erro2 %}
+                <h3><b style="margin-left: 300px">{{ erro2 }}</b></h3></br>
+            {% endif %}
+        </div>
+        <div style="top: 577px; right: 50px; position: absolute" id="datepicker"></div>
+        <div style="top: 250px; width: 100%; position: absolute">
+            <p>
+            <h1 style="text-align: center; margin-bottom: -45px">Schedule History</h1></p>
+            <table id="tabelaHistorico" class="display" style="width:100%;">
+                <thead>
+                <tr>
+                    <th>Line</th>
+                    <th>Site</th>
+                    <th>Due Date</th>
+                    <th>Item Number</th>
+                    <th>Description</th>
+                    <th>To Complete</th>
+                    <td><b>Receiving</b></td>
+                    <td><b>Submit Receiving</b></td>
+                    <th>Comentário Receiving</th>
+                    <td><b>Shipping</b></td>
+                    <td><b>Submit Shipping</b></td>
+                    <th>Comentário Shipping</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for element in elements.all %}
+                    <tr>
+                        <td>{{ element.line }}</td>
+                        <td>{{ element.site }}</td>
+                        <td>{{ element.due_date }}</td>
+                        <td>{{ element.item_number }}</td>
+                        <td>{{ element.description }}</td>
+                        <td>{{ element.to_complete }}</td>
+                        {% if element.receiving %}
+                            <td>
+                                <input style="margin-left: 35px" type="checkbox" autocomplete="off" checked disabled>
+                            </td>
+                        {% else %}
+                            <td>
+                                <input style="margin-left: 35px" type="checkbox" autocomplete="off" disabled>
+                            </td>
+                        {% endif %}
+                        {% if element.allOkReceiving %}
+                            <td>
+                                <input style="margin-left: 35px" type="checkbox" autocomplete="off" checked disabled>
+                            </td>
+                        {% else %}
+                            <td>
+                                <input style="margin-left: 35px" type="checkbox" autocomplete="off" disabled>
+                            </td>
+                        {% endif %}
+                        <td>{{ element.comentarioReceiving }}</td>
+                        {% if element.shipping %}
+                            <td>
+                                <input style="margin-left: 35px" type="checkbox" autocomplete="off" checked disabled>
+                            </td>
+                        {% else %}
+                            <td>
+                                <input style="margin-left: 35px" type="checkbox" autocomplete="off" disabled>
+                            </td>
+                        {% endif %}
+                        {% if element.allOkShipping %}
+                            <td>
+                                <input style="margin-left: 35px" type="checkbox" autocomplete="off" checked disabled>
+                            </td>
+                        {% else %}
+                            <td>
+                                <input style="margin-left: 35px" type="checkbox" autocomplete="off" disabled>
+                            </td>
+                        {% endif %}
+                        <td>{{ element.comentarioShipping }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+                <tfoot>
+                <tr>
+
+                </tr>
+                </tfoot>
+            </table>
+            <p style="margin-left: 14%; margin-top: -30px"><b>Path to older history - </b>
+                W:\sharedir\MP&L\Warehouse\PWMS\History\Production</p>
+        </div>
+        <div style="top: 560px; width: 80%; position: absolute">
+            <p>
+            <h1 style="text-align: center; margin-left: 25%; margin-top: -5px; margin-bottom: -15px">Schedule
+                Planning</h1></p>
+            <table id="tabelaDiaEscolhido" class="display" style="width:100%">
+                <thead>
+                <tr>
+                    <th>Line</th>
+                    <th>Site</th>
+                    <th>Due Date</th>
+                    <th>Item Number</th>
+                    <th>Description</th>
+                    <th>To Complete</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for elem in lista %}
+                    <tr>
+                        <td>{{ elem.line }}</td>
+                        <td>{{ elem.site }}</td>
+                        <td>{{ elem.dueDate }}</td>
+                        <td>{{ elem.itemNumber }}</td>
+                        <td>{{ elem.description }}</td>
+                        <td>{{ elem.toComplete }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+                {% if erro5 %}
+                    <tfoot>
+                    <tr>
+                        <th colspan="6" style="text-align: center; color: red"><h1>{{ erro5 }}</h1></th>
+                    </tr>
+                    </tfoot>
+                {% endif %}
+            </table>
+        </div>
+        <div style="position: absolute; left: 125px; bottom: -20px">
+            <a href="#reportIssue" data-toggle="modal" data-target="#reportIssue" class="fas fa-info-circle"
+               style="font-size: 15px; height: 22px"> Help</a>
+        </div>
+    </div>
+    <div style="bottom: -30px; margin-left: 50px; position: absolute">
+        <h6><b><i class="fa fa-chevron-left text-secondary"></i><a href={% url 'crossdocking:prodlineFilter' %}><span
+                class="text-secondary"> Back </span></a></b></h6>
+    </div>
+
+    <div class="modal fade" id="confirmCheck" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title" id="titleConfirm" style="margin-left: 15%"></h3>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="submitCheck" name="submitCheck">Confirm</button>
+                    <button type="button" id="closeSubItemsTurno1" data-dismiss="modal" class="btn btn-primary">Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <form method="POST" enctype="multipart/form-data" action="{% url 'crossdocking:reportCrossdocking' %}">
+        {% csrf_token %}
+        <div class="modal fade" id="reportIssue" tabindex="-1" role="dialog"
+             aria-labelledby="myModalLabel">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header" style="background-color: rgba(236,144,0,0.86)">
+                        <h4 class="modal-title" id="myModalLabel" style="margin-left: 45%; font-size: 40px"><i>HELP</i>
+                        </h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+                    </div>
+                    <div class="modal-body"
+                         style="background: linear-gradient(to bottom, rgba(236,144,0,0.86) 0%, ghostwhite 100%); ">
+                        <div style="margin-top: 10px">
+                            <p style="font-size: 20px"><strong>Escreva aqui possíveis erros de utilização desta página
+                                em
+                                específico, ou deixe sugestões de melhoria</strong></p>
+                            <textarea class="form-control mt-n3" name="reportICDR" id="reportICDR" rows="11"
+                                      style="background-color: floralwhite; text-align: center;font-family:sans-serif;font-size:1.5em"
+                                      required></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer" style="background-color: ghostwhite">
+                        <button type="submit" id="submitReportICDR" class="btn btn-primary">Submeter</button>
+                        <button type="button" class="btn btn-primary" value="pending" data-dismiss="modal">Fechar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+{% endblock %}
+
+{% block javascript %}
+
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <link rel="stylesheet" href="/resources/demos/style.css">
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script src="/myJavascript.js?version=4"></script>
+    <script>
+        $(function () {
+            $("#datepicker").datepicker({
+                dateFormat: 'yy-m-d',
+                inline: true,
+                onSelect: function (dateText, inst) {
+                    var path = "//PAVPD002/E_Proj/sharedir/MP&L/Schedule/";
+                    var date = $("#datepicker").datepicker("getDate");
+                    var mes = date.getMonth();
+                    if (mes == 0)
+                        mes = "Janeiro"
+                    if (mes == 1)
+                        mes = "Fevereiro"
+                    if (mes == 2)
+                        mes = "Março"
+                    if (mes == 3)
+                        mes = "Abril"
+                    if (mes == 4)
+                        mes = "Maio"
+                    if (mes == 5)
+                        mes = "Junho"
+                    if (mes == 6)
+                        mes = "Julho"
+                    if (mes == 7)
+                        mes = "Agosto"
+                    if (mes == 8)
+                        mes = "Setembro"
+                    if (mes == 9)
+                        mes = "Outubro"
+                    if (mes == 10)
+                        mes = "Novembro"
+                    if (mes == 11)
+                        mes = "Dezembro"
+                    $("#textPath").val(path + "" + $.datepicker.formatDate("yy", date) + "/" + "" + mes + " " + $.datepicker.formatDate("yy", date) + "/Daily_Schedule_" + $.datepicker.formatDate("dd.mm.yy", date) + ".xlsx");
+                    $("#requestDay").val("" + $.datepicker.formatDate("dd-mm-yy", date))
+                }
+            });
+        });
+
+        $(document).ready(function () {
+            // Setup - add a text input to each footer cell
+            $('#tabelaHistorico thead tr').clone(true).appendTo('#tabelaHistorico tfoot');
+            $('#tabelaHistorico tfoot tr:eq(1) th').each(function (i) {
+                var title = $(this).text();
+                $(this).html('<input type="text" style="margin-left: -9px; text-align: center" class="form-control" placeholder="' + title + '" />');
+
+                $('input', this).on('keyup change', function () {
+                    if (tabelaHistorico.column(i).search() !== this.value) {
+                        tabelaHistorico
+                            .column(i)
+                            .search(this.value)
+                            .draw();
+                    }
+                });
+            });
+
+            var tabelaFiltrada = $('#tabelaFiltrada').DataTable({
+                paging: false,
+                searching: false,
+                info: false,
+                scrollY: 135,
+                scrollCollapse: true,
+                columnDefs: [
+                    {
+                        targets: [2],
+                        render: function (data, type, row) {
+                            return data.substr(0, 10);
+                        }
+                    }],
+            });
+
+            var tabelaHistorico = $('#tabelaHistorico').DataTable({
+                paging: false,
+                searching: true,
+                info: false,
+                scrollY: 142,
+                scrollCollapse: true,
+                dom: 'frtipB',
+                float: 'right',
+                buttons: [
+                    'excel', 'pdf', 'print', 'copy'
+                ],
+                order: [[2, "desc"]],
+                columnDefs: [
+                    {
+                        targets: [2],
+                        render: function (data, type, row) {
+                            return data.substr(0, 10);
+                        }
+                    },
+                    {"targets": 2, "type": "time-date-sort"}
+                ],
+            });
+
+            var tabelaDiaEscolhido = $('#tabelaDiaEscolhido').DataTable({
+                paging: false,
+                searching: false,
+                info: false,
+                scrollY: 142,
+                scrollCollapse: true,
+                dom: 'frtipB',
+                float: 'right',
+                buttons: [
+                    'excel', 'pdf', 'print', 'copy'
+                ],
+                columnDefs: [
+                    {
+                        targets: [2],
+                        render: function (data, type, row) {
+                            return data.substr(0, 10);
+                        }
+                    }],
+            });
+
+            $('#tabelaFiltrada tr td:nth-child(7)').on('change', 'input', function () {
+                var data = tabelaFiltrada.row($(this).parents('tr')).data();
+                var id = $(this).attr('id')
+                var checked = $(this).is(":checked")
+                var checkbox = $(this)
+
+                if ($(this).is(":checked")) {
+                    var myModal = new bootstrap.Modal(document.getElementById('confirmCheck'))
+                    myModal.show()
+                    $('#titleConfirm').html("Confirm " + data[3] + " is ok?")
+                } else {
+                    var myModal = new bootstrap.Modal(document.getElementById('confirmCheck'))
+                    myModal.show()
+
+                    $('#titleConfirm').html("Deselect " + data[3] + "?")
+                }
+
+                $('#closeSubItemsTurno1').on('click', function () {
+                    // optional: don't cache ajax to force the content to be fresh
+                    $.ajaxSetup({
+                        cache: false
+                    });
+
+                    checkbox.click();
+                    checkbox.attr("autocomplete", "off");
+                    $("#confirmCheck").hide();
+                    $(".modal-backdrop").remove();
+                    checkbox.reset()
+                });
+
+                $('#confirmCheck').on('hide.bs.modal', function () {
+                    // optional: don't cache ajax to force the content to be fresh
+                    $.ajaxSetup({
+                        cache: false
+                    });
+
+                    checkbox.click()
+                    checkbox.attr("autocomplete", "off");
+                    $("#confirmCheck").hide();
+                    $(".modal-backdrop").remove();
+                    checkbox.reset()
+                });
+
+                $(document).on('click', '#submitCheck', function () {
+                    document.getElementById("submitCheck").disabled = true;
+                    setTimeout(function () {
+                        document.getElementById("submitCheck").disabled = false;
+                    }, 5000);
+                    $.ajax({
+                        type: 'POST',
+                        url: '/crossdocking/changeCheckbox/',
+                        data: {
+                            csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+                            receivingCheck: checked,
+                            shippingCheck: "",
+                            id: id,
+                        },
+                        success: function () {
+                            window.location = "{% url 'crossdocking:prodlineFilter' %}"
+                        }
+                    })
+                });
+            });
+
+            $('#tabelaFiltrada tr td:nth-child(9)').on('change', 'input', function () {
+                var data = tabelaFiltrada.row($(this).parents('tr')).data();
+                var id = $(this).attr('id')
+                var checked = $(this).is(":checked")
+                var checkbox = $(this)
+
+                if ($(this).is(":checked")) {
+                    var myModal = new bootstrap.Modal(document.getElementById('confirmCheck'))
+                    myModal.show()
+
+                    $('#titleConfirm').html("Confirm " + data[3] + " is ok?")
+                } else {
+                    var myModal = new bootstrap.Modal(document.getElementById('confirmCheck'))
+                    myModal.show()
+
+                    $('#titleConfirm').html("Deselect " + data[3] + "?")
+                }
+
+                $('#closeSubItemsTurno1').on('click', function () {
+
+                    $("#confirmCheck").hide();
+                    $(".modal-backdrop").remove();
+                    checkbox.reset()
+                });
+
+                $('#confirmCheck').on('hide.bs.modal', function () {
+
+                    $("#confirmCheck").hide();
+                    $(".modal-backdrop").remove();
+                    checkbox.reset()
+                });
+
+                $(document).on('click', '#submitCheck', function () {
+                    document.getElementById("submitCheck").disabled = true;
+                    setTimeout(function () {
+                        document.getElementById("submitCheck").disabled = false;
+                    }, 5000);
+                    $.ajax({
+                        type: 'POST',
+                        url: '/crossdocking/changeCheckbox/',
+                        data: {
+                            csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+                            shippingCheck: checked,
+                            receivingCheck: "",
+                            id: id,
+                        },
+                        success: function () {
+                            window.location = "{% url 'crossdocking:prodlineFilter' %}"
+                        }
+                    })
+                });
+            });
+
+            $('#tabelaFiltrada tr td:nth-child(8)').on('change', 'input', function () {
+                //update the input value
+                $(this).attr('value', $(this).val());
+                var id = $(this).attr('id')
+                var comentario = $(this).attr('value')
+
+                $.ajax({
+                    type: 'POST',
+                    url: '/crossdocking/updateComentReceiving/',
+                    data: {
+                        csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+                        id: id,
+                        comentario: comentario
+                    },
+                    success: function () {
+                        window.location = "{% url 'crossdocking:prodlineFilter' %}"
+                    }
+                })
+            });
+
+            $('#tabelaFiltrada tr td:nth-child(10)').on('change', 'input', function () {
+                //update the input value
+                $(this).attr('value', $(this).val());
+                var id = $(this).attr('id')
+                var comentario = $(this).attr('value')
+
+                $.ajax({
+                    type: 'POST',
+                    url: '/crossdocking/updateComentShipping/',
+                    data: {
+                        csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+                        id: id,
+                        comentario: comentario
+                    },
+                    success: function () {
+                        window.location = "{% url 'crossdocking:prodlineFilter' %}"
+                    }
+                })
+            });
+
+            $(document).on('click', '#allOkReceiving', function () {
+                var checkbox = $(this)
+                if ($(this).is(":checked")) {
+                    var myModal = new bootstrap.Modal(document.getElementById('confirmCheck'))
+                    myModal.show()
+                    $('#titleConfirm').html("Confirm submit for Receiving?")
+
+                    $(document).on('click', '#submitCheck', function () {
+                        document.getElementById("submitCheck").disabled = true;
+                        setTimeout(function () {
+                            document.getElementById("submitCheck").disabled = false;
+                        }, 5000);
+                        $.ajax({
+                            type: 'POST',
+                            url: '/crossdocking/submitAll/',
+                            data: {
+                                csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+                                "posicao": "receiving",
+                                "select": "select"
+                            },
+                            success: function () {
+                                window.location = "{% url 'crossdocking:prodlineFilter' %}"
+                            }
+                        })
+                    });
+                } else {
+                    var myModal = new bootstrap.Modal(document.getElementById('confirmCheck'))
+                    myModal.show()
+                    $('#titleConfirm').html("Cancel submit for Receiving?")
+
+                    $(document).on('click', '#submitCheck', function () {
+                        document.getElementById("submitCheck").disabled = true;
+                        setTimeout(function () {
+                            document.getElementById("submitCheck").disabled = false;
+                        }, 5000);
+                        $.ajax({
+                            type: 'POST',
+                            url: '/crossdocking/submitAll/',
+                            data: {
+                                csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+                                "posicao": "receiving",
+                                "select": "deselect"
+                            },
+                            success: function () {
+                                window.location = "{% url 'crossdocking:prodlineFilter' %}"
+                            }
+                        })
+                    });
+                }
+            })
+
+            $(document).on('click', '#allOkShipping', function () {
+                var checkbox = $(this)
+                checkbox.removeAttr('checked')
+                console.log(checkbox[0])
+
+                if ($(this).is(":checked")) {
+                    var myModal = new bootstrap.Modal(document.getElementById('confirmCheck'))
+                    myModal.show()
+                    $('#titleConfirm').html("Confirm submit for Shipping?")
+
+                    $(document).on('click', '#submitCheck', function () {
+                        document.getElementById("submitCheck").disabled = true;
+                        setTimeout(function () {
+                            document.getElementById("submitCheck").disabled = false;
+                        }, 20000);
+                        $.ajax({
+                            type: 'POST',
+                            url: '/crossdocking/submitAll/',
+                            data: {
+                                csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+                                "posicao": "shipping",
+                                "select": "select"
+                            },
+                            success: function () {
+                                window.location = "{% url 'crossdocking:prodlineFilter' %}"
+                            }
+                        })
+                    });
+                } else {
+                    var myModal = new bootstrap.Modal(document.getElementById('confirmCheck'))
+                    myModal.show()
+                    $('#titleConfirm').html("Cancel submit for Shipping?")
+
+                    $(document).on('click', '#submitCheck', function () {
+                        document.getElementById("submitCheck").disabled = true;
+                        setTimeout(function () {
+                            document.getElementById("submitCheck").disabled = false;
+                        }, 20000);
+                        $.ajax({
+                            type: 'POST',
+                            url: '/crossdocking/submitAll/',
+                            data: {
+                                csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+                                "posicao": "shipping",
+                                "select": "deselect"
+                            },
+                            success: function () {
+                                window.location = "{% url 'crossdocking:prodlineFilter' %}"
+                            }
+                        })
+                    });
+                }
+            })
+            $('#closeSubItemsTurno1').on('click', function () {
+                window.location = "{% url 'crossdocking:prodlineFilter' %}"
+                {% comment %}$("#confirmCheck").hide();
+                $(".modal-backdrop").remove();
+                checkbox.prop('checked', true);
+                checkbox.attr("autocomplete", "off");{% endcomment %}
+            });
+
+            $('#confirmCheck').on('hide.bs.modal', function () {
+                window.location = "{% url 'crossdocking:prodlineFilter' %}"
+                {% comment %}$("#confirmCheck").hide();
+                $(".modal-backdrop").remove();
+                checkbox.prop('checked', true);
+                checkbox.attr("autocomplete", "off");{% endcomment %}
+            });
+            {% comment %}$('#closeSubItemsTurno1').on('click', function () {
+                window.location = "{% url 'crossdocking:prodlineFilter' %}"
+                // optional: don't cache ajax to force the content to be fresh
+                $.ajaxSetup({
+                    cache: false
+                });
+
+                checkbox.click()
+                checkbox.attr("autocomplete", "off");
+                $("#confirmCheck").hide();
+                $(".modal-backdrop").remove();
+                checkbox.reset()
+            });
+
+            $('#confirmCheck').on('hide.bs.modal', function () {
+                window.location = "{% url 'crossdocking:prodlineFilter' %}"
+                // optional: don't cache ajax to force the content to be fresh
+                $.ajaxSetup({
+                    cache: false
+                });
+
+                checkbox.click()
+                checkbox.attr("autocomplete", "off");
+                $("#confirmCheck").hide();
+                $(".modal-backdrop").remove();
+                checkbox.reset()
+            });{% endcomment %}
+        });
+    </script>
+{% endblock %}

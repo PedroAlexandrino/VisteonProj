@@ -1,0 +1,236 @@
+{% extends "vware/baseArmazem.html" %}
+{% load static %}
+
+{% block body_title %}
+    <div class="text-primary">
+        <h6><b><i class="fa fa-home text-secondary"></i><a href={% url 'main:main' %}><span
+                class="text-secondary"> Home | </span></a> Prodlines</b></h6>
+    </div>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>jQuery UI Datepicker - Default functionality</title>
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <link rel="stylesheet" href="/resources/demos/style.css">
+
+    <style>
+        .containerPrincipal {
+            height: 835px;
+            width: 100%;
+            top: 11px;
+            left: 0px;
+            position: relative;
+            border: 3px solid transparent;
+        }
+
+        .button {
+            width: 35%;
+            height: 70px;
+            display: inline-block;
+            font-family: Arial, "Helvetica", sans-serif;
+            font-size: 45px;
+            color: #fff;
+            text-decoration: none;
+            text-align: center;
+            text-shadow: 1px 1px 0 #7D9EAD, 2px 2px 0 #7D9EAD, 1px 1px 0 #7D9EAD;
+            padding-top: 6px;
+            margin-left: auto;
+            margin-right: auto;
+            left: 30px;
+            position: relative;
+            cursor: pointer;
+            border: none;
+            background: #FBA51A;
+            background-image: linear-gradient(bottom, #E57200 0%, #FBA51A 100%);
+            border-radius: 5px;
+            box-shadow: inset 0px 1px 0px #FBA51A, 0px 5px 0px 0px #cb7b25, 0px 10px 5px #999;
+        }
+
+        .button:active {
+            top: 3px;
+            box-shadow: inset 0px 1px 0px #FBA51A, 0px 2px 0px 0px #E57200, 0px 5px 3px #999;
+        }
+
+        .button:hover, button:focus {
+            outline: none;
+            transform: translateY(0.5px);
+        }
+    </style>
+{% endblock %}
+
+
+{% block body_content %}
+    <!-- tabela que contem os prodlines a ser filtrados no ficheiro -->
+    <div class="containerPrincipal">
+        <table id="prodlines" class="display" style="width:100%">
+            <thead>
+            <tr>
+                <th>Prodlines</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for prodline in prodlines.all %}
+                <tr>
+                    <td>{{ prodline.nome }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+            <tfoot>
+            <tr>
+                <th>
+                    <button class="btn btn-outline-primary" style="height: 16px; width: 70px; margin-left: -18px"
+                            data-toggle="modal"
+                            data-target="#addNew" id="addRow">Add new
+                    </button>
+                    </br>
+                    <div id="removeButton">
+                        <button class="btn btn-outline-primary mt-1"
+                                style="height: 16px; width: 70px; margin-left: -18px"
+                                data-toggle="modal" data-target="#remove" name="removeRow" id="removeRow">Delete
+                        </button>
+                    </div>
+                </th>
+            </tr>
+            {% if erro %}
+                <tfoot>
+                <tr>
+                    <th style="text-align: center; color: red"><h1>{{ erro }}</h1></th>
+                </tr>
+                </tfoot>
+            {% endif %}
+            </tfoot>
+        </table>
+        <div style="width: 95%; bottom: 0%; position: absolute; border: 3px solid transparent; text-align: center">
+            <button type="submit" class="button" data-toggle="modal" data-target="#alterarGrupoCrossdocking">
+                Change account Groups
+            </button>
+        </div>
+        <div style="bottom: 0px; margin-left: 25px; position: absolute">
+            <h6><b><i class="fa fa-chevron-left text-secondary"></i><a
+                    href={% url 'crossdocking:prodlineFilter' %}><span
+                    class="text-secondary"> Back </span></a></b></h6>
+        </div>
+    </div>
+
+
+    <!-- Modal -->
+    <!-- form que surge após clicar no botao add new-->
+    <form method="POST" class="form" action="{% url 'crossdocking:create' %}" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="modal fade" id="addNew" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" id="myModalLabel" style="margin-left: 35%">Create new prodline</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+                    </div>
+                    <div class="modal-body">
+                        <h6><b>Prodline name</b></h6>
+                        <input class="form-control" type="text" name="nome" id="nome" placeholder="Type here"/>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Save changes</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <!-- form que surge após clicar no botao delete -->
+    <form method="POST" class="form" action="{% url 'crossdocking:delete' %}" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="modal fade" id="remove" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" id="myModalLabel">Remove Item</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+                    </div>
+                    <div class="modal-body">
+                        <p id="info"></p>
+                        <input type="hidden" name="nome2" id="nome2" value="{{ nome2 }}"/>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Confirm</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <form method="POST" class="form" action="{% url 'crossdocking:changeUserGroups' %}" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="modal fade" id="alterarGrupoCrossdocking" tabindex="-1" role="dialog"
+             aria-labelledby="myModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" id="myModalLabel">Change account groups</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+                    </div>
+                    <div class="modal-body">
+                        <label for="username"><h6><b style="color: black">Username</b></h6></label>
+                        <select class="form-control" id="username" name="username" required>
+                            <option value="">Select User</option>
+                            {% for user in users.all %}
+                                <option value="{{ user.username }}">{{ user.username }}</option>
+                            {% endfor %}
+                        </select></br>
+                        <label for="paginas"><h6><b style="color: black">Pages</b></h6></label>
+                        <select class="form-control" name="paginas" id="paginas" required>
+                            <option value="">Select accessable pages</option>
+                            <option value="crossdocking">Crossdocking</option>
+                            <option value="none">Remove access to Crossdocking</option>
+                        </select>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">
+                            Create
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+{% endblock %}
+
+{% block javascript %}
+    <script>
+        $(document).ready(function () {
+            var table = $('#prodlines').DataTable({
+                paging: false,
+                searching: false,
+                info: false,
+                scrollY: 395,
+                scrollCollapse: true,
+                columnDefs: [
+                    {orderable: false, targets: '_all'},
+                    {width: 200, targets: 0}
+                ],
+                select: {
+                    style: 'os',
+                    items: 'cell'
+                },
+                dom: 'frtipB',
+                buttons: [
+                    'copy'
+                ]
+            });
+
+            $('#prodlines tbody').on('click', 'tr', function () {
+                var nome = table.row($(this)).data();
+                var modalInfo = "Want to delete " + nome + "?";
+                $('#info').html(modalInfo);
+                $('#nome2').val(nome);
+                $('#removeButton').on('click', 'button', function () {
+                });
+            });
+
+        });
+    </script>
+{% endblock %}

@@ -1,0 +1,199 @@
+{% extends "vware/baseArmazem.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block body_title %}
+    <div class="text-primary">
+        <h6><b><i class="fa fa-home text-secondary"></i><a href={% url 'main:main' %}><span
+                class="text-secondary"> Home | </span></a> Login</b></h6>
+    </div>
+{% endblock %}
+
+{% block body_content %}
+    <br/>
+    <br/>
+    <br/>
+    <br/>
+    <br/>
+    <br/>
+    <form method="POST" class="rounded col-xl-5 col-lg-6 col-md-8 col-sm-20 mx-auto form p-4"
+          style="background-image: url('{% static "fundo.jpg" %}'); opacity: 80%; width: 40%"
+          action={% url 'accounts:login' %}>
+        {% csrf_token %}
+
+        <div class="text-center"><h1><b style="color: black">LOGIN</b></h1></div>
+        <br/>
+        <br/>
+        <br/>
+        <div class="form-group col-md-12">
+            <label><h5><strong style="color: black">Username</strong></h5></label>
+            <input type="text" name="username" class="form-control mt-n1" id="exampleInputEmail1"
+                   aria-describedby="emailHelp"
+                   placeholder="Insert email">
+        </div>
+        <div class="form-group col-md-12">
+            <label><h5><b style="color: black">Password</b></h5></label>
+            <input type="password" name="password" class="form-control mt-n1" id="exampleInputPassword1"
+                   placeholder="Password">
+        </div>
+        <br/>
+        <br/>
+        <div class="text-center">
+            <br/>
+            <button type="submit" class="btn btn-secondary">Submit</button>
+        </div>
+        <div class="text-center mt-2 mb-n2">
+            <a class="btn-link rounded" style="color: black" href={% url 'accounts:sign' %}><b> Create account </b></a>
+        </div>
+        <div class="text-center mt-2 mb-n2">
+            <a class="btn-link rounded" style="color: black" href={% url 'accounts:changePassword' %}><b> Change password </b></a>
+        </div>
+        <div class="text-right mb-n3">
+            <a href={% url 'main:main' %}><span
+                    class="text-white fa fa-home text-orange btn-lg"></span></a>
+        </div>
+    </form>
+
+    {% if erro %}
+        <br/>
+        <br/>
+        <div class="text-center">
+            {{ erro }}
+        </div>
+        <br/>
+        <br/>
+    {% endif %}
+{% endblock %}
+
+{% block javascript %}
+    <script>
+        function simulateKeyPress(character) {
+            jQuery.event.trigger({type: 'keypress', which: character.charCodeAt(0)});
+        }
+
+        function iconsSuperiores() {
+            var token = '{{csrf_token}}';
+            var reorderGroup = '';
+            var rowGroupDataSrc = 0;
+            var ordemArray = {};
+
+
+            var table = $('#example').DataTable({
+                scrollY: '80vh',
+                paging: false,
+                searching: true,
+                ajax: function (data, callback, settings) {
+                    $.ajax({
+                        headers: {"X-CSRFToken": '{{csrf_token}}'},
+                        url: "{% url 'vware:armazem_tabelaParent' %}",
+                        type: 'GET',
+                        dataType: 'json',
+                        success: function (data) {
+                            callback(data);
+                        }
+                    });
+                },
+                order: [0, 'asc'],
+                buttons: [
+                    {
+                        extend: 'print',
+                        autoClose: 'true',
+                        text: '',
+                        tag: 'span',
+                        className: 'btn btn-secondary btn-sm fas fa-print',
+                        titleAttr: 'Imprimir',
+                    },
+                    {
+                        extend: 'pdfHtml5',
+                        autoClose: 'true',
+                        text: '',
+                        tag: 'span',
+                        className: 'btn btn-secondary btn-sm fas fa-file-pdf',
+                        titleAttr: 'PDF',
+                    },
+                    {
+                        extend: 'excelHtml5',
+                        autoClose: 'true',
+                        text: '',
+                        tag: 'span',
+                        className: 'btn btn-secondary btn-sm fas fa-file-excel',
+                        titleAttr: 'Excel',
+                    },
+                    {
+                        extend: 'copyHtml5',
+                        autoClose: 'true',
+                        text: '',
+                        tag: 'span',
+                        className: 'btn btn-secondary btn-sm fas fa-copy',
+                        titleAttr: 'Copiar tabela',
+                    }
+                ],
+                dom: 'Bfrtip',
+                pageLength: 40,
+                columns: [
+                    {"data": "oem"},
+                    {"data": "qpsShipping"},
+                    {"data": "qpsManufatura"},
+                    {"data": "checklist"},
+                    {"data": "inspecaoDedicada"},
+                    {"data": "crossDocking"},
+                    {"data": "engenharia"},
+                    {"data": "servicos"},
+                    {"data": "guideLines"},
+                ],
+                select: {
+                    style: 'multi',
+                    selector: 'td:first-child'
+                }
+            });
+        }
+
+        var openModal = function () {
+            var token = '{{csrf_token}}';
+            var btn = $(this);
+            $.ajax({
+                headers: {"X-CSRFToken": token},
+                url: btn.attr("data-url"),
+                type: 'get',
+                dataType: 'json',
+                beforeSend: function () {
+                    $('#modalJS').modal('show');
+                },
+                success: function (data) {
+                    $('#modalJS .modal-content').html(data.html_form);
+                }
+            });
+        };
+
+        var confirmModal = function () {
+            var token = '{{csrf_token}}';
+            var form = $(this);
+
+            $.ajax({
+                headers: {"X-CSRFToken": token},
+                url: form.attr('data-url'),
+                data: {"jsonPedidos": jsonPedido},
+                type: form.attr('method'),
+                dataType: 'json',
+                success: function (data) {
+                    if (data.form_is_valid) {
+                        showPedidoToast();
+                        jsonPedido = {};
+                        location.reload();
+                    } else {
+                        jsonPedido = {};
+                        $('#modalJS .modal-content').html(data.html_form);
+                        location.reload();
+                    }
+                }
+            });
+            return false;
+        };
+
+        $(document).ready(function () {
+            iconsSuperiores();
+            $('#modalJS').on("submit", ".update-form", confirmModal);
+            $('#example').on("click", ".show-form-modal", openModal);
+        });
+    </script>
+{% endblock %}

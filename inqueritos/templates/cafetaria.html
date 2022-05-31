@@ -1,0 +1,318 @@
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block body_title %}
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+
+    <!-- jQuery library -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+    <!-- Latest compiled JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+
+    <link rel="icon" href="{% static 'favicon3.png' %}" type="image/x-icon"/>
+    <meta charset="UTF-8">
+    <title>Inquérito</title>
+    <style>
+        div.imagem {
+            z-index: 1;
+            position: relative;
+            height: 98%;
+            width: 98%;
+        }
+
+        div.imagem::before {
+            content: "";
+            background: url('{% static "data_flow_primary_blue.png" %}') no-repeat 50% 25%;
+            opacity: .6;
+            background-size: 98% 98%;
+            position: absolute;
+            z-index: -1;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+        }
+
+        div.imagem p {
+            font-weight: bold;
+            color: #000000;
+        }
+
+        .row {
+            white-space: nowrap;
+        }
+
+        .row > div {
+            width: 100px;
+            display: inline-block;
+        }
+
+        fieldset {
+            background-color: #eeeeee;
+            width: 65%;
+            height: 82%;
+            margin-left: 19%;
+            opacity: 90%;
+            margin-top: 1%;
+        }
+
+        legend {
+            background-color: gray;
+            color: white;
+            padding: 5px 10px;
+        }
+    </style>
+{% endblock %}
+
+{% block body_content %}
+    {% if erro %}
+        <div class="container p-1">
+            <div class="row no-gutters">
+                <div class="col-lg-4 col-md-1 m-auto">
+                    <div class="alert alert-danger shadow my-3" role="alert" style="border-radius: 3px">
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="True" style="color:#721C24">&times;</span>
+                        </button>
+                        <div class="row">
+                            <svg width="3em" height="3em" viewBox="0 0 16 16"
+                                 class="m-1 bi bi-exclamation-circle-fill"
+                                 fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd"
+                                      d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8 4a.905.905 0 0 0-.9.995l.35 3.507a.552.552 0 0 0 1.1 0l.35-3.507A.905.905 0 0 0 8 4zm.002 6a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"/>
+                            </svg>
+                            <p style="font-size:30px; margin-left: 10px; margin-top: 3px"
+                               class="mb-0 font-weight-light"><b class="mr-1">Sem permissão!</b>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+    {% if linguagem.all.0.nome == "pt" %}
+        <div class="imagem">
+            <p style="text-align: center; font-size: 70px; text-shadow: 1px 1px 5px lightskyblue"><i>Participe nas
+                melhorias
+                de
+                SST</i></p>
+            <fieldset style="text-align: center">
+                <div class="row" style="text-align: right; margin: 10px">
+                    <button type="button" id="botaoPT"
+                            style="background-color: transparent; color: darkorange; border: none"><b>PT</b></button>
+                    /
+                    <button type="button" id="botaoEN" style="border: none">EN</button>
+                </div>
+                </br>
+                <p style="font-size: 20px; text-align: left; margin: 10px"><i>No âmbito da certificação da ISO 45001
+                    (norma de
+                    sistemas
+                    de
+                    gestão de saúde e segurança no trabalho), a
+                    Visteon Portuguesa deve estabelecer processos de participação dos trabalhadores para as
+                    melhorias
+                    das
+                    condições de trabalho.</i></p>
+                <p style="font-size: 20px; text-align: left; margin: 10px"><i>Para tal, foi desenvolvida esta plataforma
+                    em que qualquer colaborador (empregado Visteon, empregado Temporário, empresas Contratadas) pode
+                    contribuir com sugestões de melhoria.</i></p>
+                <form method="POST" enctype="multipart/form-data" action="{% url 'inqueritos:submitResposta' %}">
+                    {% csrf_token %}
+                    </br></br>
+                    <p style="font-size: 23px; text-align: left; margin-left: 74px">Deixe-nos a sua sugestão de
+                        melhoria:</p>
+                    <textarea style="margin-top: -10px" name="comentarios" rows="18" cols="150"></textarea>
+                    </br></br></br>
+                    <button style="margin-top: -18px; font-size: 25px" type="submit"
+                            class="btn btn-primary">Submit
+                    </button>
+                    <input type="hidden" value="cafetaria" name="tipoInquerito">
+                </form>
+                <p style="text-align: left; margin: 10px">Muito obrigada</p>
+            </fieldset>
+            <button type="button" style="right: 0; bottom: 0; position: absolute" data-toggle="modal"
+                    data-target="#confirmarCheck">RH
+            </button>
+        </div>
+    {% elif linguagem.all.0.nome == "en" %}
+        <div class="imagem">
+            <p style="text-align: center; font-size: 70px; text-shadow: 1px 1px 5px lightskyblue"><i>Participate in
+                Health and Safety improvements!</i></p>
+            <fieldset style="text-align: center">
+                <div class="row" style="text-align: right; margin: 10px">
+                    <button type="button" id="botaoPT" style="border: none">PT</button>
+                    /
+                    <button type="button" id="botaoEN"
+                            style="background-color: transparent; color: darkorange; border: none"><b>EN</b></button>
+                </div>
+                </br>
+                <p style="font-size: 20px; text-align: left; margin: 10px"><i>As part of the ISO 45001 certification
+                    (standard
+                    for
+                    occupational health and safety management systems), Visteon Portuguesa must establish processes
+                    for
+                    employee participation to improve working conditions.</i></p>
+                <p style="font-size: 20px; text-align: left; margin: 10px"><i>This platform was developed so that you
+                    (Visteon employee, Temporary employee, Contractor companies) can contribute with suggestions for
+                    improvement.</i></p>
+                </br>
+                <form method="POST" enctype="multipart/form-data" action="{% url 'inqueritos:submitResposta' %}">
+                    {% csrf_token %}
+                    </br>
+                    <p style="font-size: 23px; text-align: left; margin-left: 74px">Leave your suggestion for
+                        improvement:</p>
+                    <textarea style="margin-top: -10px" name="comentarios" rows="18" cols="150"></textarea>
+                    </br></br></br>
+                    <button style="margin-top: -18px; font-size: 25px" type="submit" class="btn btn-primary">Submit
+                    </button>
+                    <input type="hidden" value="cafetaria" name="tipoInquerito">
+                </form>
+                <p style="text-align: left; margin: 10px">Thank you</p>
+            </fieldset>
+            <button type="button" style="right: 0; bottom: 0; position: absolute" data-toggle="modal"
+                    data-target="#confirmCheck">HR
+            </button>
+        </div>
+    {% endif %}
+
+    <!-- Modal -->
+    <div id="confirmarCheck" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header" style="text-align: center">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Inserir password</h4>
+                </div>
+                <div class="modal-body" style="text-align: center">
+                    <input class="form-control" name="password" id="passwordPT" type="password"
+                           placeholder="Escreva aqui">
+                    <input type="hidden" value="cafetaria" name="tipoInquerito">
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" id="confirmarPT" class="btn btn-default">Confirmar</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Fechar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div id="confirmCheck" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header" style="text-align: center">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Insert password</h4>
+                </div>
+                <div class="modal-body" style="text-align: center">
+                    <input class="form-control" name="password" id="passwordEN" type="password" placeholder="Type here">
+                    <input type="hidden" value="cafetaria" name="tipoInquerito">
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" id="confirmarEN" class="btn btn-default">Confirm</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascript %}
+    <script>
+        $(document).ready(function () {
+            {#document.getElementById("botaoPT").style.backgroundColor = 'gray';#}
+            $(document).on('click', '#botaoPT', function () {
+                if (document.getElementById("botaoPT").style.backgroundColor !== 'blue') {
+
+                    $.ajax({
+                        type: 'POST',
+                        url: '/inqueritos/setLinguagemCafetaria/',
+                        data: {
+                            csrfmiddlewaretoken: '{{ csrf_token }}',
+                            'linguagem': 'pt'
+                        },
+                        success: function () {
+                            window.location = "{% url 'inqueritos:cafetaria' %}"
+                        }
+                    })
+                }
+            });
+            $(document).on('click', '#botaoEN', function () {
+                if (document.getElementById("botaoEN").style.backgroundColor !== 'blue') {
+
+                    $.ajax({
+                        type: 'POST',
+                        url: '/inqueritos/setLinguagemCafetaria/',
+                        data: {
+                            csrfmiddlewaretoken: '{{ csrf_token }}',
+                            'linguagem': 'en'
+                        },
+                        success: function () {
+                            window.location = "{% url 'inqueritos:cafetaria' %}"
+                        }
+                    })
+                }
+            });
+
+            $(document).on('click', '#confirmarPT', function () {
+                var password = document.getElementById('passwordPT').value
+                $.ajax({
+                    type: 'POST',
+                    url: '/inqueritos/confirmarPasswordRH/',
+                    data: {
+                        csrfmiddlewaretoken: '{{ csrf_token }}',
+                        'tipoInquerito': 'cafetaria',
+                        'password': password
+                    },
+                    success: function () {
+                        window.location = "{% url 'inqueritos:cafetaria' %}"
+                        var element = document.createElement('a');
+                        element.setAttribute('href', '/media/inqueritos/cafetaria/workbookCafetaria.xls');
+                        element.setAttribute('download', 'my-file-name');
+
+                        element.style.display = 'none';
+                        document.body.appendChild(element);
+
+                        element.click();
+
+                        document.body.removeChild(element);
+                    },
+                    error: function () {
+                        window.location = "{% url 'inqueritos:cafetaria' %}"
+                    }
+                })
+            });
+            $(document).on('click', '#confirmarEN', function () {
+                var password = document.getElementById('passwordEN').value
+                $.ajax({
+                    type: 'POST',
+                    url: '/inqueritos/confirmarPasswordRH/',
+                    data: {
+                        csrfmiddlewaretoken: '{{ csrf_token }}',
+                        'tipoInquerito': 'cafetaria',
+                        'password': password
+                    },
+                    success: function () {
+                        window.location = "{% url 'inqueritos:cafetaria' %}"
+                        var element = document.createElement('a');
+                        element.setAttribute('href', '/media/inqueritos/cafetaria/workbookCafetaria.xls');
+                        element.setAttribute('download', 'my-file-name');
+
+                        element.style.display = 'none';
+                        document.body.appendChild(element);
+
+                        element.click();
+
+                        document.body.removeChild(element);
+                    },
+                    error: function () {
+                        window.location = "{% url 'inqueritos:cafetaria' %}"
+                    }
+                })
+            });
+        });
+    </script>
+{% endblock %}

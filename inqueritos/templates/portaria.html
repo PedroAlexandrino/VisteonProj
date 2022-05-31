@@ -1,0 +1,339 @@
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block body_title %}
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+
+    <!-- jQuery library -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+    <!-- Latest compiled JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+
+    <link rel="icon" href="{% static 'favicon3.png' %}" type="image/x-icon"/>
+    <meta charset="UTF-8">
+    <title>Inquérito</title>
+    <style>
+        div.imagem {
+            z-index: 1;
+            position: relative;
+            height: 98%;
+            width: 98%;
+        }
+
+        div.imagem::before {
+            content: "";
+            background: url('{% static "data_flow_primary_blue.png" %}') no-repeat 50% 25%;
+            opacity: .6;
+            background-size: 98% 98%;
+            position: absolute;
+            z-index: -1;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+        }
+
+        div.imagem p {
+            font-weight: bold;
+            color: #000000;
+        }
+
+        .row {
+            white-space: nowrap;
+        }
+
+        .row > div {
+            width: 100px;
+            display: inline-block;
+        }
+
+        fieldset {
+            background-color: #eeeeee;
+            width: 65%;
+            height: 81%;
+            margin-left: 19%;
+            opacity: 90%;
+            margin-top: 1%;
+        }
+
+        legend {
+            background-color: gray;
+            color: white;
+            padding: 5px 10px;
+        }
+    </style>
+{% endblock %}
+{% block body_content %}
+    {% if linguagem.all.0.nome == "pt" %}
+        <div class="imagem">
+            <p style="text-align: center; margin: 5px; font-size: 70px; text-shadow: 1px 1px 5px lightskyblue"><i>Participe
+                nas
+                melhorias
+                de
+                SST</i></p>
+            <fieldset style="text-align: center">
+                <div class="row" style="text-align: right; margin: 10px">
+                    <button id="botaoPT" style="background-color: transparent; color: darkorange; border: none">
+                        <b>PT</b></button>
+                    /
+                    <button id="botaoEN" style="border: none">EN</button>
+                </div>
+                <p style="font-size: 20px; text-align: left; margin: 10px"><i>No âmbito da certificação da ISO 45001
+                    (norma de
+                    sistemas
+                    de
+                    gestão de saúde e segurança no trabalho), a Visteon Portuguesa deve estabelecer processos de
+                    participação
+                    dos trabalhadores para as melhorias das condições de trabalho.</i></p>
+                <p style="font-size: 20px; text-align: left; margin: 10px"><i>Para tal, foi desenvolvida esta plataforma
+                    para quem nos
+                    visita
+                    possa contribuir com sugestões de melhoria.</i></p>
+                </br>
+                <form method="POST" enctype="multipart/form-data" action="{% url 'inqueritos:submitResposta' %}">
+                    {% csrf_token %}
+                    <p style="font-size: 23px">SENTIU-SE SEGURO NAS NOSSAS INSTALAÇÕES?</p>
+                    <div class="row" style="margin-top: -10px">
+                        <div><p style="font-size: 23px"><i>SIM</i><input style="margin-left: 15px" type="checkbox"
+                                                                         name="sim" id="simPT" required></p>
+                        </div>
+                        <div><p style="font-size: 23px"><i>NÃO</i><input style="margin-left: 15px" type="checkbox"
+                                                                         name="nao" id="naoPT" required></p>
+                        </div>
+                    </div>
+                    <p style="font-size: 23px; text-align: left; margin-left: 74px">Deixe-nos a sua sugestão de
+                        melhoria:</p>
+                    <textarea style="margin-top: -10px" name="comentarios" rows="18" cols="150"></textarea>
+                    </br></br></br>
+                    <button style="margin-top: -18px; font-size: 20px" type="submit" class="btn btn-primary">Submit
+                    </button>
+                    <input type="hidden" value="portaria" name="tipoInquerito">
+                </form>
+                <p style="text-align: left; margin: 10px">Muito obrigada</p>
+            </fieldset>
+            <button type="button" style="right: 0; bottom: 0; position: absolute" data-toggle="modal"
+                    data-target="#confirmCheck">RH
+            </button>
+        </div>
+    {% elif linguagem.all.0.nome == "en" %}
+        <div class="imagem">
+            <p style="text-align: center; margin: 5px; font-size: 70px; text-shadow: 1px 1px 5px lightskyblue"><i>Participate
+                in
+                Health and Safety improvements!</i></p>
+            <fieldset style="text-align: center">
+                <div class="row" style="text-align: right; margin: 10px">
+                    <button type="button" id="botaoPT" style="border: none">PT</button>
+                    /
+                    <button type="button" id="botaoEN"
+                            style="background-color: transparent; color: darkorange; border: none"><b>EN</b></button>
+                </div>
+                <p style="font-size: 20px; text-align: left; margin: 10px"><i>As part of the ISO 45001 certification
+                    (standard
+                    for
+                    occupational health and safety management systems), Visteon Portuguesa must establish processes
+                    for
+                    employee participation to improve working conditions.</i></p>
+                <p style="font-size: 20px; text-align: left; margin: 10px"><i>This platform was developed so that you
+                    can
+                    contribute
+                    with suggestions for improvement.</i></p>
+                </br>
+                <form method="POST" enctype="multipart/form-data" action="{% url 'inqueritos:submitResposta' %}">
+                    {% csrf_token %}
+                    <p style="font-size: 23px">DID YOU FEEL SAFE IN OUR FACILITIES?</p>
+                    <div class="row" style="margin-top: -10px">
+                        <div><p style="font-size: 23px"><i>YES</i><input style="margin-left: 15px" type="checkbox"
+                                                                         name="sim" id="simEN" required></p>
+                        </div>
+                        <div><p style="font-size: 23px"><i>NO</i><input style="margin-left: 15px" type="checkbox"
+                                                                        name="nao" id="naoEN" required></p>
+                        </div>
+                    </div>
+                    <p style="font-size: 23px; text-align: left; margin-left: 74px">Leave your suggestion for
+                        improvement:</p>
+                    <textarea style="margin-top: -10px" name="comentarios" rows="18" cols="150"></textarea>
+                    </br></br></br>
+                    <button style="margin-top: -18px; font-size: 20px" type="submit" class="btn btn-primary">Submit
+                    </button>
+                    <input type="hidden" value="portaria" name="tipoInquerito">
+                </form>
+                <p style="text-align: left; margin: 10px">Thank you</p>
+            </fieldset>
+            <button type="button" style="right: 0; bottom: 0; position: absolute" data-toggle="modal"
+                    data-target="#confirmCheck">HR
+            </button>
+        </div>
+    {% endif %}
+
+    <form method="POST" enctype="multipart/form-data" action="{% url 'inqueritos:confirmarPasswordRH' %}">
+        {% csrf_token %}
+        <!-- Modal -->
+        <div id="confirmarCheck" class="modal fade" role="dialog">
+            <div class="modal-dialog">
+                <!-- Modal content-->
+                <div class="modal-content">
+                    <div class="modal-header" style="text-align: center">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title">Inserir password</h4>
+                    </div>
+                    <div class="modal-body" style="text-align: center">
+                        <input class="form-control" name="password" id="passwordPT" type="password"
+                               placeholder="Escreva aqui">
+                        <input type="hidden" value="portaria" name="tipoInquerito">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" id="confirmarPT" class="btn btn-default">Confirmar</button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Fechar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <form method="POST" enctype="multipart/form-data" action="{% url 'inqueritos:confirmarPasswordRH' %}">
+        {% csrf_token %}
+        <!-- Modal -->
+        <div id="confirmCheck" class="modal fade" role="dialog">
+            <div class="modal-dialog">
+                <!-- Modal content-->
+                <div class="modal-content">
+                    <div class="modal-header" style="text-align: center">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title">Insert password</h4>
+                    </div>
+                    <div class="modal-body" style="text-align: center">
+                        <input class="form-control" name="password" id="passwordEN" type="password"
+                               placeholder="Type here">
+                        <input type="hidden" value="portaria" name="tipoInquerito">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" id="confirmarEN" class="btn btn-default">Confirm</button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+{% endblock %}
+
+
+{% block javascript %}
+    <script>
+        $(document).ready(function () {
+            {#document.getElementById("botaoPT").style.backgroundColor = 'gray';#}
+            $(document).on('click', '#botaoPT', function () {
+                if (document.getElementById("botaoPT").style.backgroundColor !== 'gray') {
+                    $.ajax({
+                        type: 'POST',
+                        url: '/inqueritos/setLinguagemPortaria/',
+                        data: {
+                            csrfmiddlewaretoken: '{{ csrf_token }}',
+                            'linguagem': 'pt'
+                        },
+                        success: function () {
+                            window.location = "{% url 'inqueritos:portaria' %}"
+                        },
+                        error: function () {
+                            window.location = "{% url 'inqueritos:portaria' %}"
+                        }
+                    })
+                }
+            });
+            $(document).on('click', '#botaoEN', function () {
+                if (document.getElementById("botaoEN").style.backgroundColor !== 'gray') {
+                    $.ajax({
+                        type: 'POST',
+                        url: '/inqueritos/setLinguagemPortaria/',
+                        data: {
+                            csrfmiddlewaretoken: '{{ csrf_token }}',
+                            'linguagem': 'en'
+                        },
+                        success: function () {
+                            window.location = "{% url 'inqueritos:portaria' %}"
+                        },
+                        error: function () {
+                            window.location = "{% url 'inqueritos:portaria' %}"
+                        }
+                    })
+                }
+            });
+            $(document).on('click', '#simEN', function () {
+                $('#simEN').prop('required', true);
+                $("#naoEN").prop('checked', false);
+                $("#naoEN").prop('required', false);
+            });
+            $(document).on('click', '#naoEN', function () {
+                $('#naoEN').prop('required', true);
+                $("#simEN").prop('checked', false);
+                $("#simEN").prop('required', false);
+            });
+            $(document).on('click', '#simPT', function () {
+                $('#simPT').prop('required', true);
+                $("#naoPT").prop('checked', false);
+                $("#naoPT").prop('required', false);
+            });
+            $(document).on('click', '#naoPT', function () {
+                $('#naoPT').prop('required', true);
+                $("#simPT").prop('checked', false);
+                $("#simPT").prop('required', false);
+            });
+
+            $(document).on('click', '#confirmarPT', function () {
+                var password = document.getElementById('passwordPT').value
+                $.ajax({
+                    type: 'POST',
+                    url: '/inqueritos/confirmarPasswordRH/',
+                    data: {
+                        csrfmiddlewaretoken: '{{ csrf_token }}',
+                        'tipoInquerito': 'portaria',
+                        'password': password
+                    },
+                    success: function () {
+                        var element = document.createElement('a');
+                        element.setAttribute('href', '/media/inqueritos/portaria/workbookPortaria.xls');
+                        element.setAttribute('download', 'my-file-name');
+
+                        element.style.display = 'none';
+                        document.body.appendChild(element);
+
+                        element.click();
+
+                        document.body.removeChild(element);
+                    },
+                    error: function(){
+                        window.location = "{% url 'inqueritos:portaria' %}"
+                    }
+                })
+            });
+            $(document).on('click', '#confirmarEN', function () {
+                var password = document.getElementById('passwordEN').value
+                $.ajax({
+                    type: 'POST',
+                    url: '/inqueritos/confirmarPasswordRH/',
+                    data: {
+                        csrfmiddlewaretoken: '{{ csrf_token }}',
+                        'tipoInquerito': 'portaria',
+                        'password': password
+                    },
+                    success: function () {
+                        var element = document.createElement('a');
+                        element.setAttribute('href', '/media/inqueritos/portaria/workbookPortaria.xls');
+                        element.setAttribute('download', 'my-file-name');
+
+                        element.style.display = 'none';
+                        document.body.appendChild(element);
+
+                        element.click();
+
+                        document.body.removeChild(element);
+                    },
+                    error: function(){
+                        window.location = "{% url 'inqueritos:portaria' %}"
+                    }
+                })
+            });
+        });
+    </script>
+{% endblock %}
